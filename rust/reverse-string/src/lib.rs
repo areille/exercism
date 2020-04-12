@@ -5,4 +5,6 @@ pub fn reverse(input: &str) -> String {
         .rev()
         .collect::<Vec<_>>()
         .join("")
+    // Better solution
+    // input.chars().rev().collect()
 }
