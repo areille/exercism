@@ -1,0 +1,4 @@
+**/.exercism
+javascript/*/node_modules
+dart/*/.dart_tool
+rust/*/target
