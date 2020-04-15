@@ -2,6 +2,7 @@ pub mod graph {
     use graph_items::edge::Edge;
     use graph_items::node::Node;
     use std::collections::HashMap;
+    #[derive(Default)]
     pub struct Graph {
         pub attrs: HashMap<String, String>,
         pub nodes: Vec<Node>,
@@ -16,11 +17,11 @@ pub mod graph {
                 attrs: HashMap::<String, String>::new(),
             }
         }
-        pub fn with_nodes(mut self, nodes: &Vec<Node>) -> Graph {
+        pub fn with_nodes(mut self, nodes: &[Node]) -> Graph {
             self.nodes = nodes.to_vec();
             self
         }
-        pub fn with_edges(mut self, edges: &Vec<Edge>) -> Graph {
+        pub fn with_edges(mut self, edges: &[Edge]) -> Graph {
             self.edges = edges.to_vec();
             self
         }
@@ -31,6 +32,10 @@ pub mod graph {
             }
             self.attrs = _attrs;
             self
+        }
+
+        pub fn get_node(self, s: &str) -> Option<Node> {
+            self.nodes.into_iter().find(|n| n.clone().name() == s)
         }
     }
 
@@ -85,8 +90,15 @@ pub mod graph {
                     self
                 }
 
-                pub fn node(self) -> String {
+                pub fn name(self) -> String {
                     self.name
+                }
+
+                pub fn get_attr<'a>(&'a self, s: &str) -> Option<&str> {
+                    match self.attrs.get(s) {
+                        Some(val) => Some(val),
+                        None => None,
+                    }
                 }
             }
         }
