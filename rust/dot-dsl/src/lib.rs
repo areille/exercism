@@ -1,8 +1,21 @@
+macro_rules! impl_attrs {
+    () => {
+        pub fn get_attr(&self, key: &str) -> Option<&str> {
+            self.attrs.get(key).map(|s| s.as_str())
+        }
+
+        pub fn with_attrs(mut self, attrs: &[(&str, &str)]) -> Self {
+            self.attrs = attrs.iter().map(|(a, b)| (a.to_string(), b.to_string())).collect();
+            self
+        }
+    };
+}
+
 pub mod graph {
     use graph_items::edge::Edge;
     use graph_items::node::Node;
     use std::collections::HashMap;
-    #[derive(Default)]
+    #[derive(Default, PartialEq, Eq)]
     pub struct Graph {
         pub attrs: HashMap<String, String>,
         pub nodes: Vec<Node>,
@@ -11,12 +24,9 @@ pub mod graph {
 
     impl Graph {
         pub fn new() -> Self {
-            Graph {
-                nodes: Vec::<Node>::new(),
-                edges: Vec::<Edge>::new(),
-                attrs: HashMap::<String, String>::new(),
-            }
+            Self::default()
         }
+
         pub fn with_nodes(mut self, nodes: &[Node]) -> Graph {
             self.nodes = nodes.to_vec();
             self
@@ -25,24 +35,16 @@ pub mod graph {
             self.edges = edges.to_vec();
             self
         }
-        pub fn with_attrs(mut self, attrs: &[(&str, &str)]) -> Graph {
-            let mut _attrs = HashMap::<String, String>::new();
-            for attr in attrs.iter() {
-                _attrs.insert(attr.0.to_string(), attr.1.to_string());
-            }
-            self.attrs = _attrs;
-            self
+        pub fn get_node(&self, s: &str) -> Option<&Node> {
+            self.nodes.iter().find(|n| n.name() == s)
         }
-
-        pub fn get_node(self, s: &str) -> Option<Node> {
-            self.nodes.into_iter().find(|n| n.clone().name() == s)
-        }
+        impl_attrs!();
     }
 
     pub mod graph_items {
         pub mod edge {
             use std::collections::HashMap;
-            #[derive(Debug, Clone, Eq, PartialEq)]
+            #[derive(Debug, Clone, Eq, PartialEq, Default)]
             pub struct Edge {
                 start: String,
                 end: String,
@@ -51,24 +53,18 @@ pub mod graph {
             impl Edge {
                 pub fn new(a: &str, b: &str) -> Self {
                     Edge {
-                        start: a.to_owned(),
-                        end: b.to_owned(),
-                        attrs: HashMap::<String, String>::new(),
+                        start: a.to_string(),
+                        end: b.to_string(),
+                        ..Self::default()
                     }
                 }
-                pub fn with_attrs(mut self, attrs: &[(&str, &str)]) -> Edge {
-                    let mut _attrs = HashMap::<String, String>::new();
-                    for attr in attrs.iter() {
-                        _attrs.insert(attr.0.to_string(), attr.1.to_string());
-                    }
-                    self.attrs = _attrs;
-                    self
-                }
+
+                impl_attrs!();
             }
         }
         pub mod node {
             use std::collections::HashMap;
-            #[derive(Debug, Clone, Eq, PartialEq)]
+            #[derive(Debug, Clone, Eq, PartialEq, Default)]
             pub struct Node {
                 name: String,
                 attrs: HashMap<String, String>,
@@ -76,30 +72,16 @@ pub mod graph {
             impl Node {
                 pub fn new(string: &str) -> Self {
                     Node {
-                        name: string.to_owned(),
-                        attrs: HashMap::<String, String>::new(),
+                        name: string.to_string(),
+                        ..Self::default()
                     }
                 }
 
-                pub fn with_attrs(mut self, attrs: &[(&str, &str)]) -> Node {
-                    let mut _attrs = HashMap::<String, String>::new();
-                    for attr in attrs.iter() {
-                        _attrs.insert(attr.0.to_string(), attr.1.to_string());
-                    }
-                    self.attrs = _attrs;
-                    self
+                pub fn name(&self) -> &str {
+                    &self.name
                 }
 
-                pub fn name(self) -> String {
-                    self.name
-                }
-
-                pub fn get_attr<'a>(&'a self, s: &str) -> Option<&str> {
-                    match self.attrs.get(s) {
-                        Some(val) => Some(val),
-                        None => None,
-                    }
-                }
+                impl_attrs!();
             }
         }
     }
