@@ -1,9 +1,6 @@
 use rand::{thread_rng, Rng};
 
 fn mod_pow(mut base: u64, mut exp: u64, m: u64) -> u64 {
-    if m == 1 {
-        return 0;
-    }
     let mut r = 1;
     base %= m;
     while exp > 0 {
