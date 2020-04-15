@@ -8,10 +8,16 @@ pub struct Clock {
 
 impl fmt::Display for Clock {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        println!("{}", self.d);
-        let hours = self.d / 60 % 24;
-        let minutes = self.d % 60;
-        write!(f, "{:02}:{:02}", hours, minutes)
+        if self.d >= 0 {
+            let hours = self.d / 60 % 24;
+            let minutes = self.d % 60;
+            write!(f, "{:02}:{:02}", hours, minutes)
+        } else {
+            let minutes = (60 + (self.d % 60)) % 60;
+            let base_hour = if minutes != 0 && minutes < 60 { 23 } else { 24 };
+            let hours = (base_hour + (self.d / 60 % 24)) % 24;
+            write!(f, "{:02}:{:02}", hours, minutes)
+        }
     }
 }
 
