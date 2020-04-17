@@ -10,30 +10,47 @@ import (
 	"unicode"
 )
 
-// ContainsLetter returns true if str contains at least one letter
-func ContainsLetter(str string) bool {
-	for _, r := range str {
-		if unicode.IsLetter(r) {
-			return true
-		}
-	}
-	return false
+// Remark is a convenience type for identifying what kind of remark it is.
+type Remark struct {
+	remark string
+}
+
+func (r Remark) isSilence() bool {
+	return r.remark == ""
+}
+
+func (r Remark) isShouting() bool {
+	hasLetters := strings.IndexFunc(r.remark, unicode.IsLetter) >= 0
+	isUpcased := strings.ToUpper(r.remark) == r.remark
+
+	return hasLetters && isUpcased
+}
+
+func (r Remark) isQuestion() bool {
+	return strings.HasSuffix(r.remark, "?")
+}
+
+func (r Remark) isExasperated() bool {
+	return r.isShouting() && r.isQuestion()
+}
+
+func newRemark(remark string) Remark {
+	return Remark{strings.TrimSpace(remark)}
 }
 
 // Hey should have a comment documenting it.
 func Hey(remark string) string {
-	if strings.TrimSpace(remark) == "" {
+	r := newRemark(remark)
+	switch {
+	case r.isSilence():
 		return "Fine. Be that way!"
-	}
-	remark = strings.TrimSpace(remark)
-	if strings.HasSuffix(remark, "?") {
-		if strings.ToUpper(remark) == remark && ContainsLetter(remark) {
-			return "Calm down, I know what I'm doing!"
-		}
-		return "Sure."
-	}
-	if strings.ToUpper(remark) == remark && ContainsLetter(remark) {
+	case r.isExasperated():
+		return "Calm down, I know what I'm doing!"
+	case r.isShouting():
 		return "Whoa, chill out!"
+	case r.isQuestion():
+		return "Sure."
+	default:
+		return "Whatever."
 	}
-	return "Whatever."
 }
