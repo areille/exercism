@@ -2,39 +2,25 @@
 pub struct ChessPosition(i32, i32);
 
 #[derive(Debug)]
-pub struct Queen(ChessPosition);
+pub struct Queen(i32, i32);
 
 impl ChessPosition {
     pub fn new(rank: i32, file: i32) -> Option<Self> {
-        if rank < 0 || rank > 7 || file < 0 || file > 7 {
-            return None;
-        } else {
-            return Some(Self(rank, file));
+        match (rank, file) {
+            (0..=7, 0..=7) => Some(ChessPosition(rank, file)),
+            _ => None,
         }
-    }
-
-    pub fn is_same_row(&self, other: &ChessPosition) -> bool {
-        self.0 == other.0
-    }
-
-    pub fn is_same_column(&self, other: &ChessPosition) -> bool {
-        self.1 == other.1
-    }
-
-    pub fn is_diagonal(&self, other: &ChessPosition) -> bool {
-        let r = (other.0 - self.0) / (other.1 - self.1);
-        r == -1 || r == 1
     }
 }
 
 impl Queen {
     pub fn new(position: ChessPosition) -> Self {
-        Self(position)
+        Self(position.0, position.1)
     }
 
     pub fn can_attack(&self, other: &Queen) -> bool {
-        self.0.is_same_row(&other.0)
-            || self.0.is_same_column(&other.0)
-            || self.0.is_diagonal(&other.0)
+        let dx = self.0 - other.0;
+        let dy = self.1 - other.1;
+        dx == 0 || dy == 0 || dx.abs() == dy.abs()
     }
 }
